@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nightjar</title>
+<!-- The palette is imported, never copied: src/tokens/palette.css stays the
+     only place in the project that holds a raw color value. This page is loaded
+     from the profile's chrome/ directory over file://, so the relative path
+     resolves normally — unlike a url() inside a custom property, which is what
+     decision 004 is about. -->
+<link rel="stylesheet" href="../tokens/palette.css">
+<style>
+  html {
+    block-size: 100%;
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    min-block-size: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.75rem;
+    background-color: var(--nj-ink-900);
+    color: var(--nj-slate-100);
+    font-family: "Adwaita Sans", "Noto Sans", Cantarell, system-ui, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .mark {
+    inline-size: 96px;
+    block-size: 96px;
+    display: block;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.42em;
+    text-indent: 0.42em;
+    text-transform: uppercase;
+    color: var(--nj-slate-050);
+  }
+
+  p {
+    margin: 0;
+    max-inline-size: 34ch;
+    text-align: center;
+    line-height: 1.55;
+    color: var(--nj-slate-300);
+    text-wrap: balance;
+  }
+
+  .brief {
+    color: var(--nj-slate-200);
+  }
+
+  /* The one link on the page. It is not `--link-color`: that token belongs to
+     Thunderbird's own chrome, and this document is loaded over file:// from the
+     profile, so it only has the palette to draw on. */
+  a {
+    color: var(--nj-slate-300);
+    text-decoration-color: var(--nj-ink-500);
+    text-underline-offset: 3px;
+    transition: color 120ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  a:hover,
+  a:focus-visible {
+    color: var(--nj-amber-500);
+    text-decoration-color: var(--nj-amber-600);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--nj-amber-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* The eye opens when the page settles. Motion is the only flourish here, and
+     it stays out of the way of anyone who has asked for less of it. */
+  .pupil {
+    transform-origin: center;
+    animation: open 900ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  @keyframes open {
+    from { transform: scale(0.2); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pupil { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <!-- The mark from the README, drawn rather than spelled: the nightjar is the
+       color of bark and invisible until it opens its eyes, which are amber. -->
+  <svg class="mark" viewBox="0 0 96 96" role="img" aria-label="Nightjar">
+    <path d="M48 6 L86 48 L48 90 L10 48 Z"
+          fill="var(--nj-ink-850)" stroke="var(--nj-ink-600)" stroke-width="2"/>
+    <path d="M48 20 L74 48 L48 76 L22 48 Z"
+          fill="none" stroke="var(--nj-ink-500)" stroke-width="1.5"/>
+    <circle class="pupil" cx="48" cy="48" r="11" fill="var(--nj-amber-500)"/>
+  </svg>
+
+  <h1>Nightjar</h1>
+
+  <p class="brief">A dark theme for Thunderbird that changes more than the color.</p>
+
+  <p>
+    <a href="https://github.com/wiliancirillo/nightjar">github.com/wiliancirillo/nightjar</a>
+  </p>
+</body>
+</html>

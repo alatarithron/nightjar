@@ -1,0 +1,43 @@
+/* Nightjar — primitive palette.
+ *
+ * These are the only raw color values in the theme. Every other layer must
+ * consume them through the semantic tokens in `semantic.css`, never by
+ * repeating a hex value.
+ *
+ * Scale reads dark → light, mirroring Thunderbird's own `--color-<hue>-<step>`
+ * convention so the two systems stay mentally compatible.
+ */
+
+:root {
+  /* Ink — cool, desaturated near-blacks used for every background surface. */
+  --nj-ink-950: #090c11; /* window frame, deepest recess */
+  --nj-ink-900: #0e131a; /* app background */
+  --nj-ink-850: #131922; /* pane background */
+  --nj-ink-800: #19212c; /* raised surface, cards, rows */
+  --nj-ink-700: #222c3a; /* hover surface */
+  --nj-ink-600: #2e3a4b; /* active surface, strong border */
+  --nj-ink-500: #3d4b5f; /* subtle border, divider */
+
+  /* Slate — foreground ramp. */
+  --nj-slate-400: #64748b; /* disabled text */
+  --nj-slate-300: #8d9bb0; /* placeholder, tertiary text */
+  --nj-slate-200: #b3bfcf; /* secondary text, idle icons */
+  --nj-slate-100: #dde4ee; /* primary text */
+  --nj-slate-050: #f2f6fb; /* emphasized text, selected text */
+
+  /* Amber — the nightjar's eye. Single accent, used sparingly. */
+  --nj-amber-400: #edb75e;
+  --nj-amber-500: #dd9c34; /* accent */
+  --nj-amber-600: #b87b22;
+
+  /* Support hues — status only, never decoration. */
+  --nj-teal-400: #4cc9c4;
+  --nj-green-400: #63c98a;
+  --nj-rose-400: #ef7f7f;
+  --nj-rose-500: #dc5f5f;
+  --nj-violet-400: #a68bfa;
+
+  /* Alpha utilities — layered over surfaces instead of new opaque steps. */
+  --nj-accent-wash: rgb(221 156 52 / 14%);
+  --nj-accent-wash-strong: rgb(221 156 52 / 24%);
+}

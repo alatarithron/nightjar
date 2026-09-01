@@ -1,0 +1,39 @@
+; Nightjar — KWin rule: paint Thunderbird's window decoration in the theme's ink.
+;
+; Thunderbird draws its own titlebar on the main window and on no other, so every
+; secondary window — compose, dialogs, the key manager — gets one from the window
+; manager instead, in the desktop's color. A user stylesheet cannot reach a window
+; decoration. This closes it from the other side. See docs/kde.md and
+; .agents/decisions/011-the-window-decoration-is-not-ours.md.
+;
+; Install:
+;   cp contrib/kde/Nightjar.colors ~/.local/share/color-schemes/
+;   System Settings → Window Management → Window Rules → Import…  (this file)
+;   qdbus6 org.kde.KWin /KWin reconfigure
+;
+; Import is the safe route: it merges with rules you already have. Appending this
+; file to ~/.config/kwinrulesrc by hand does not, because the group name and the
+; [General] index would collide with an existing rule.
+;
+; Two things this file encodes that are easy to get wrong, both of them measured
+; rather than assumed:
+;
+;   * The window class is org.mozilla.Thunderbird, not thunderbird. On Wayland
+;     KWin reads the app id from the desktop file, and its substring matching is
+;     case-sensitive, so a rule written for the lowercase name matches nothing —
+;     silently, which looks exactly like a rule that matched and did nothing.
+;   * There is no title condition, so this covers every Thunderbird window. On the
+;     main window it is a no-op: Thunderbird draws that titlebar itself and the
+;     window manager has nothing to recolor. To narrow it to the compose window
+;     only, add title=Write: with titlematch=2 — bearing in mind captions are
+;     locale-dependent.
+;
+; decocolorrule=2 is Force. wmclassmatch=1 is Exact.
+
+[e5f4a1c2-9d3b-4c7e-8a16-nightjar0001]
+Description=Nightjar — Thunderbird window decoration
+decocolor=Nightjar
+decocolorrule=2
+wmclass=org.mozilla.Thunderbird
+wmclasscomplete=false
+wmclassmatch=1

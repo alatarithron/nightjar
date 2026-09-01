@@ -1,0 +1,412 @@
+/* Nightjar — semantic layer.
+ *
+ * Maps Thunderbird's own design tokens onto the Nightjar palette. Every custom
+ * property named here was read from the shipping stylesheets of the installed
+ * Thunderbird (see `docs/thunderbird-tokens.md`), not invented — if a token is
+ * not in that reference, it does not exist and will silently do nothing.
+ *
+ * `!important` is mandatory: userChrome.css is a *user* stylesheet and loses to
+ * Thunderbird's *author* stylesheets in the cascade without it.
+ */
+
+:root {
+  /* ---- Frame, panes, toolbars ---- */
+  --toolbar-background-color: var(--nj-ink-900) !important;
+  --toolbar-text-color: var(--nj-slate-100) !important;
+  --toolbarseparator-color: var(--nj-ink-500) !important;
+  --chrome-content-separator-color: var(--nj-ink-600) !important;
+
+  /* ---- Top band ----
+   *
+   * The strip the tabs sit in, and the titlebar buttons beside them. The band's
+   * surface itself has no token in this configuration and is painted in
+   * `layers/chrome.css`; what is left here is everything Thunderbird layers on
+   * top of it.
+   *
+   * `--tabs-toolbar-background-color` is a translucent white wash Thunderbird
+   * paints over the tab strip to lift it out of the titlebar. Against ink it
+   * greys the strip, so it is replaced by an opaque step *down* to ink-950
+   * instead. The band is ink-900 and a selected tab is
+   * `--toolbar-background-color`, also ink-900, so recessing the strip is what
+   * keeps the tab readable: the tab rises out of the strip to meet the content
+   * below it, which is the shape a tab is supposed to have. The box shadow is
+   * Thunderbird's inset black gradient over the same strip and goes with it.
+   *
+   * The `--toolbox-*` four are consumed in exactly one place — the titlebar
+   * button hover under a Breeze GTK theme, which inverts them into a filled
+   * pill. Left alone they invert into the system headerbar grey, the one color
+   * this change exists to remove. They are set to the band's own colors, so
+   * they stay right if a later Thunderbird starts reading them for the surface
+   * their names describe — with the text tone one step down the ramp, at
+   * slate-200 rather than primary text: inverted into a filled pill on a
+   * near-black band, primary text is brighter than a hover state needs to be. */
+  --tabs-toolbar-background-color: var(--nj-ink-950) !important;
+  --tabs-toolbar-box-shadow: none !important;
+  --toolbox-background-color: var(--nj-ink-900) !important;
+  --toolbox-background-color-inactive: var(--nj-ink-900) !important;
+  --toolbox-text-color: var(--nj-slate-200) !important;
+  --toolbox-text-color-inactive: var(--nj-slate-400) !important;
+
+  --sidebar-background: var(--nj-ink-850) !important;
+  --sidebar-background-color: var(--nj-ink-850) !important;
+  --sidebar-color: var(--nj-slate-200) !important;
+  --sidebar-text-color: var(--nj-slate-200) !important;
+  --sidebar-border: var(--nj-ink-600) !important;
+  --sidebar-border-color: var(--nj-ink-600) !important;
+
+  /* ---- Selection ---- */
+  --selected-item-color: var(--nj-amber-500) !important;
+  --selected-item-text-color: var(--nj-ink-950) !important;
+  --item-focus-selected-border-color: var(--nj-amber-400) !important;
+  --select-focus-text-color: var(--nj-slate-050) !important;
+
+  /* ---- Accent and links ---- */
+  --color-accent-primary: var(--nj-amber-500) !important;
+  --color-accent-primary-hover: var(--nj-amber-400) !important;
+  --color-accent-primary-active: var(--nj-amber-600) !important;
+  --link-color: var(--nj-teal-400) !important;
+  --link-color-hover: var(--nj-amber-400) !important;
+  --link-color-active: var(--nj-amber-500) !important;
+  --link-color-visited: var(--nj-violet-400) !important;
+
+  /* ---- Toolbar buttons ---- */
+  --toolbarbutton-background-color-hover: var(--nj-ink-700) !important;
+  --toolbarbutton-background-color-active: var(--nj-ink-600) !important;
+  --toolbar-button-hover-background-color: var(--nj-ink-700) !important;
+  --toolbar-button-hover-border-color: var(--nj-ink-600) !important;
+  --toolbar-button-active-background-color: var(--nj-ink-600) !important;
+  --toolbar-button-active-border-color: var(--nj-ink-500) !important;
+  --toolbarbutton-icon-fill-attention: var(--nj-amber-500) !important;
+  --toolbarbutton-icon-fill-opacity: 1 !important;
+  --toolbarbutton-checked-background: var(--nj-accent-wash) !important;
+
+  /* ---- Fields and search ---- */
+  --toolbar-field-background-color: var(--nj-ink-800) !important;
+  --toolbar-field-color: var(--nj-slate-100) !important;
+  --toolbar-field-border-color: var(--nj-ink-600) !important;
+  --toolbar-field-focus-border-color: var(--nj-amber-500) !important;
+  --input-border-color: var(--nj-ink-600) !important;
+  /* Not a duplicate of `--toolbar-button-hover-border-color` above, despite the
+   * name: this older spelling is what the compose window's subject line and
+   * address rows use for their border. */
+  --toolbarbutton-hover-bordercolor: var(--nj-ink-600) !important;
+  --search-bar-background: var(--nj-ink-800) !important;
+  --search-bar-color: var(--nj-slate-100) !important;
+  --search-bar-border-color: var(--nj-ink-600) !important;
+  --search-bar-focus-background: var(--nj-ink-850) !important;
+  --search-field-placeholder: var(--nj-slate-300) !important;
+
+  /* ---- Panels and popups ---- */
+  --panel-background-color: var(--nj-ink-850) !important;
+  --panel-background-color-dimmed: var(--nj-ink-800) !important;
+  --panel-background-color-dimmed-further: var(--nj-ink-700) !important;
+  --panel-background-color-dimmed-even-further: var(--nj-ink-600) !important;
+  --panel-text-color: var(--nj-slate-100) !important;
+  --panel-border-color: var(--nj-ink-600) !important;
+  --autocomplete-popup-highlight-background: var(--nj-accent-wash-strong) !important;
+  --autocomplete-popup-highlight-color: var(--nj-slate-050) !important;
+  --autocomplete-popup-url-color: var(--nj-teal-400) !important;
+
+  /* ---- Buttons ---- */
+  --button-background-color: var(--nj-ink-700) !important;
+  --button-background-color-hover: var(--nj-ink-600) !important;
+  --button-background-color-active: var(--nj-ink-500) !important;
+  --button-background-color-primary: var(--nj-amber-500) !important;
+  --button-background-color-primary-hover: var(--nj-amber-400) !important;
+  --button-background-color-primary-active: var(--nj-amber-600) !important;
+  --button-border-color: var(--nj-ink-500) !important;
+  --button-border-color-primary: var(--nj-amber-600) !important;
+  --button-destructive-background-color: var(--nj-rose-500) !important;
+  --button-destructive-hover-background-color: var(--nj-rose-400) !important;
+  --button-link-text-color: var(--nj-teal-400) !important;
+
+  /* ---- Dialogs and modals ----
+   *
+   * The in-content dialog family, which is the modal Thunderbird opens over the
+   * window: account settings, filters, folder properties. It carried literal
+   * toolkit greys, derived from nothing Nightjar owns, which is why the modals
+   * stayed light after the layout ramp landed.
+   *
+   * A note that used to sit here claimed a second `--dialog-*` family was
+   * declared by the toolkit and therefore out of scope. That was wrong, and
+   * chasing it is what turned into decision 012. Grepping `omni.ja` for each
+   * name: `--dialog-background` is declared by the messenger's own
+   * `aboutDialog.css`; `--dialog-bg-color`, `--dialog-shadow` and
+   * `--dialog-button-bg-color` belong to the bundled pdf.js viewer and reach
+   * nothing in the mail interface; and the toolkit's only `--dialog-*` is
+   * `--dialog-warning-text-color`. So there was no toolkit family to bring in.
+   * The standalone dialog windows were unthemed for an unrelated reason — see
+   * the "Dialog windows" block above, and `layers/chrome.css` for the surface
+   * they are drawn on. */
+  --dialog-background-color: var(--nj-ink-850) !important;
+  --dialog-box-border-color: var(--nj-ink-600) !important;
+  --dialog-text-color: var(--nj-slate-100) !important;
+
+  --dialog-button-background-color-hover: var(--nj-ink-600) !important;
+  --dialog-button-background-color-active: var(--nj-ink-500) !important;
+  --dialog-button-text-color-hover: var(--nj-slate-050) !important;
+
+  /* Thunderbird derives the primary hover and active states by mixing the
+   * highlight toward black. Nightjar goes the other way, matching
+   * `--button-background-color-primary-*` above, so a primary button in a dialog
+   * behaves like a primary button anywhere else. */
+  --dialog-highlight-color: var(--nj-amber-500) !important;
+  --dialog-highlight-text-color: var(--nj-ink-950) !important;
+  --dialog-primary-background-hover: var(--nj-amber-400) !important;
+  --dialog-primary-background-active: var(--nj-amber-600) !important;
+
+  /* ---- Dialog windows ----
+   *
+   * `shared/themeableDialog.css`, which is what the standalone XUL windows use:
+   * message filters, folder properties, the search dialog, every prompt. It
+   * declares these on `:root` as system color keywords — `Menu`, `Field`,
+   * `-moz-Dialog` — and only maps them onto Thunderbird's own primitives under
+   * `:root[lwtheme]`. The default theme is not a lightweight theme, so the
+   * system values are what those windows actually got, which is the same
+   * `[lwtheme]` gate that decision 009 found on the top band.
+   *
+   * `--box-text-color` belongs to this family and is deliberately absent: it is
+   * on the reference's never-consumed list. The other ten are read by
+   * `themeableDialog.css` itself, verified by counting `var()` uses. */
+  --box-background-color: var(--nj-ink-850) !important;
+  --box-border-color: var(--nj-ink-600) !important;
+
+  --field-background-color: var(--nj-ink-800) !important;
+  --field-text-color: var(--nj-slate-100) !important;
+  --field-border-color: var(--nj-ink-600) !important;
+  --field-border-hover-color: var(--nj-ink-500) !important;
+
+  /* The focus ring on a dialog's default button. Thunderbird's value is
+   * `-moz-Dialog`, which paints the border in the dialog's own background —
+   * invisible, and the reason a focused OK button looked unfocused. */
+  --primary-focus-border: var(--nj-amber-500) !important;
+
+  /* Buttons and menulists inside a selected richlistitem. Thunderbird lays a
+   * `--button-background-color` gradient over this, so it shows only where that
+   * gradient is transparent; it still has to be a Nightjar surface underneath. */
+  --richlist-button-background: var(--nj-ink-800) !important;
+
+  --tab-hover-background: var(--nj-ink-700) !important;
+  --tab-selected-background: var(--nj-accent-wash) !important;
+
+  /* ---- The About dialog ----
+   *
+   * Three literals in `chrome://messenger/content/messenger/aboutDialog.css`:
+   * the surface, the box the logo sits in, and the text on them. Nothing
+   * derives them from anything, so this window stayed in flat greys after every
+   * other dialog was themed.
+   *
+   * They live in the *content* directory rather than the skin, which is why
+   * they could not be overridden until `bin/dump-tb-reference.sh` was taught to
+   * look there — the reference had been treating "the skin" as the boundary of
+   * what Thunderbird declares, and it never was. */
+  --dialog-background: var(--nj-ink-900) !important;
+  --client-box-background: var(--nj-ink-850) !important;
+  --dialog-box-color: var(--nj-slate-100) !important;
+
+  /* ---- Close buttons ---- */
+  --close-button-background: var(--nj-ink-700) !important;
+  --close-button-background-hover: var(--nj-ink-600) !important;
+  --close-button-background-active: var(--nj-ink-500) !important;
+  --close-button-text: var(--nj-slate-200) !important;
+  --close-button-text-active: var(--nj-slate-050) !important;
+  --close-button-border-hover: var(--nj-ink-500) !important;
+  --close-button-border-active: var(--nj-amber-500) !important;
+  --close-button-outline: var(--nj-amber-500) !important;
+
+  /* ---- Cards in list views ----
+   *
+   * One token, not eleven. The other ten `--list-container-*` properties are
+   * already derived from `--layout-background-3`, `--layout-border-1` and
+   * `--selected-item-color`, all of which Nightjar owns, so they followed the
+   * theme the moment the layout ramp landed. This is the only one left holding
+   * a raw grey. */
+  --list-container-border-selected: var(--nj-ink-600) !important;
+
+  /* ---- Layout surfaces ----
+   *
+   * Thunderbird's base surface ramp (`shared/layout.css`), and the highest-value
+   * override in the file: the tree cards, dialogs, boxes and message pane all
+   * derive from it, so mapping twelve tokens here reaches far more of the
+   * interface than any selector could. In dark mode the ramp runs 0 (darkest,
+   * main content) to 4 (lightest, elements inside content), which is the order
+   * mirrored below. */
+  --layout-background-0: var(--nj-ink-900) !important; /* main content */
+  --layout-background-1: var(--nj-ink-850) !important; /* center panes, secondary sidebars */
+  --layout-background-2: var(--nj-ink-850) !important; /* primary sidebars */
+  --layout-background-3: var(--nj-ink-800) !important; /* blocks inside the content */
+  --layout-background-4: var(--nj-ink-700) !important; /* elements inside the content */
+
+  --layout-color-0: var(--nj-slate-050) !important; /* emphasized */
+  --layout-color-1: var(--nj-slate-100) !important; /* main text */
+  --layout-color-2: var(--nj-slate-200) !important; /* secondary */
+  --layout-color-3: var(--nj-slate-300) !important; /* tertiary */
+
+  --layout-border-0: var(--nj-ink-600) !important; /* between layout sections */
+  --layout-border-1: var(--nj-ink-600) !important; /* inside an element */
+  --layout-border-2: var(--nj-ink-500) !important;
+
+  /* ---- Spaces toolbar ----
+   *
+   * The vertical rail on the far left. It is the outermost surface, so it takes
+   * the deepest ink; the current space is the one navigation state that earns a
+   * solid accent rather than a wash. `--spaces-bg-image` is Thunderbird's own
+   * lightening gradient, which does nothing useful over ink-950. */
+  /* The rail's buttons do not read `--icon-*`. They read a parallel family,
+   * `--spaces-icon-*`, which `icons.css` points at a larger "normal" artwork
+   * set — so replacing `--icon-mail` changed the spaces *menu* and left the
+   * rail exactly as it was. Verified the hard way: the replacement measured
+   * zero pixels of difference on the rail.
+   *
+   * Aliasing one family onto the other is what Thunderbird itself does under
+   * `:root[uidensity="compact"]`, so this is its own idiom rather than a
+   * workaround, and it keeps a single piece of artwork behind both the rail and
+   * the menu. */
+  --spaces-icon-mail: var(--icon-mail) !important;
+  --spaces-icon-address-book: var(--icon-address-book) !important;
+  --spaces-icon-calendar: var(--icon-calendar) !important;
+  --spaces-icon-tasks: var(--icon-tasks) !important;
+  --spaces-icon-chat: var(--icon-chat) !important;
+  --spaces-icon-settings: var(--icon-settings) !important;
+
+  --spaces-bg-color: var(--nj-ink-950) !important;
+  --spaces-bg-image: none !important;
+  --spaces-button-text-color: var(--nj-slate-200) !important;
+  --spaces-button-active-bg-color: var(--nj-amber-500) !important;
+  --spaces-button-active-text-color: var(--nj-ink-950) !important;
+  --spaces-button-badge-bg-color: var(--nj-rose-400) !important;
+  --spaces-button-badge-text-color: var(--nj-ink-950) !important;
+
+  /* ---- Message list ----
+   *
+   * Covers both layouts: `--listbox-*` drives the table view, `--tree-card-*`
+   * the cards view. The unfocused and hover variants Thunderbird derives by
+   * color-mix from `--layout-background-3` and `--selected-item-color` are left
+   * alone — both inputs are already Nightjar's, so the derivation follows. */
+  --tree-pane-background: var(--nj-ink-950) !important;
+  --tree-view-bg: var(--nj-ink-900) !important;
+  --tree-view-color: var(--nj-slate-100) !important;
+  --tree-view-header-hover-bg: var(--nj-ink-700) !important;
+  --tree-view-header-hover-active-bg: var(--nj-ink-600) !important;
+  --tree-row-delete-button-color: var(--nj-rose-400) !important;
+  --unread-color: var(--nj-slate-050) !important;
+
+  --tree-card-background: var(--nj-ink-850) !important;
+  --tree-card-border: var(--nj-ink-600) !important;
+  --tree-card-border-hover: var(--nj-amber-600) !important;
+  --tree-card-border-focus: var(--nj-amber-500) !important;
+  --tree-focus-outline: var(--nj-amber-500) !important;
+
+  --listbox-hover: var(--nj-ink-800) !important;
+  --listbox-selected-bg: var(--nj-accent-wash) !important;
+  --listbox-selected-color: var(--nj-slate-100) !important;
+  --listbox-focused-selected-bg: var(--nj-accent-wash-strong) !important;
+
+  /* ---- Folders ---- */
+  --new-folder-color: var(--nj-amber-400) !important;
+
+  --folderpane-unread-count-background: var(--nj-ink-700) !important;
+  --folderpane-unread-count-text: var(--nj-slate-100) !important;
+  --folderpane-unread-new-count-background: var(--nj-amber-600) !important;
+  --folderpane-total-count-background: var(--nj-ink-800) !important;
+  --folderpane-total-count-text: var(--nj-slate-300) !important;
+
+  /* Folder icon colors. Defaults only: a color the user picks for a folder, and
+   * a tag color, arrive as an inline style from about3Pane.js and still win.
+   * `--account-color` is deliberately not set — it is per-account and setting it
+   * here would flatten every account to one hue.
+   *
+   * The generic folder is slate, not a hue: it is by far the most repeated icon
+   * in the pane, and the support hues are reserved for folders that mean
+   * something. */
+  --folder-color-folder: var(--nj-slate-200) !important;
+  --folder-color-inbox: var(--nj-teal-400) !important;
+  --folder-color-draft: var(--nj-violet-400) !important;
+  --folder-color-sent: var(--nj-green-400) !important;
+  --folder-color-outbox: var(--nj-teal-400) !important;
+  --folder-color-archive: var(--nj-amber-400) !important;
+  --folder-color-spam: var(--nj-rose-400) !important;
+  --folder-color-trash: var(--nj-slate-400) !important;
+  --folder-color-template: var(--nj-slate-300) !important;
+  --folder-color-newsletter: var(--nj-slate-300) !important;
+  --folder-color-rss: var(--nj-amber-400) !important;
+  --folder-color-folder-rss: var(--nj-amber-400) !important;
+  --folder-color-folder-filter: var(--nj-violet-400) !important;
+  --folder-color-warning: var(--nj-rose-400) !important;
+
+  /* ---- Roles that live in the primitives file ----
+   *
+   * `colors.css` holds two different kinds of thing under one prefix, and this
+   * theme's rule of never touching it was written as if it held only one.
+   *
+   * `--color-blue-50`, `--color-gray-70`, `--color-ink-40` are the raw scale.
+   * Overriding those is what the rule is for: Thunderbird's own components pick
+   * from the scale for meaning, and repainting a rung changes things that were
+   * never about the theme.
+   *
+   * `--color-primary-*` and `--color-surface-*` are not rungs. They are roles —
+   * the primary action color, the surface ramp — that happen to be declared in
+   * the same file, and they behave exactly like the semantic tokens around
+   * them. Their dark values are `#58c9ff` and a cool grey ramp, which is why
+   * the account hub's sign-in button was bright blue with a cyan glow under the
+   * dialog while everything around it was ink.
+   *
+   * Reach is why this is worth the exception: the surface roles are read in 18
+   * stylesheets and the primary roles in 10 — the account hub, account
+   * settings, downloads, import, the calendar dialogs, extensions. Ten
+   * declarations here do what a hundred `--hub-*` overrides would not.
+   *
+   * `--color-surface-raised` is left out: the reference lists it as declared
+   * and never consumed. */
+  --color-primary-default: var(--nj-amber-500) !important;
+  --color-primary-hover: var(--nj-amber-400) !important;
+  --color-primary-pressed: var(--nj-amber-600) !important;
+  --color-primary-soft: var(--nj-ink-800) !important;
+
+  --color-surface-base: var(--nj-ink-850) !important;
+  --color-surface-subtle: var(--nj-ink-800) !important;
+  --color-surface-lower: var(--nj-ink-900) !important;
+  --color-surface-deep: var(--nj-ink-700) !important;
+  --color-surface-border: var(--nj-ink-600) !important;
+  --color-surface-border-intense: var(--nj-ink-500) !important;
+
+  /* ---- Calendar views ----
+   *
+   * The calendar is its own chrome package, `chrome://calendar/skin/`, and it
+   * was invisible to `docs/thunderbird-tokens.md` until the generator was
+   * pointed at it. Most of its `--view*` family already derives from
+   * `--layout-*` and `--selected-item-color`, so the grid was dark before any
+   * of this; what is below is the part that does not derive from anything
+   * Nightjar owns, plus one value that does and is too loud.
+   *
+   * The loud one is the selected day column. Thunderbird mixes the accent in at
+   * 25% and paints the entire column with it, which over ink reads as a muddy
+   * olive field rather than a highlight — measured at 66/53/33, which is
+   * amber-500 at exactly 25%. The column heading is already accent-colored and
+   * bold, so the field behind it only has to whisper: `--nj-accent-wash` is the
+   * 14% used for selected rows everywhere else in the theme. */
+  --viewDayBoxSelectedBackground: var(--nj-accent-wash) !important;
+  --viewDayBoxOffSelectedBackground: var(--nj-accent-wash) !important;
+  --viewDayBoxOtherSelectedBackground: var(--nj-accent-wash) !important;
+
+  /* Weekend and off-hours recede instead of being mixed from Thunderbird's own
+   * ink primitives, which are not on the Nightjar ramp. */
+  --viewWeekendBackground: var(--nj-ink-950) !important;
+  --viewOffTimeBackground: var(--nj-ink-950) !important;
+  --viewMonthWeekLabelBackground: var(--nj-ink-800) !important;
+
+  /* Drag feedback while moving or creating an event. Thunderbird uses
+   * `--color-blue-50` for all three, the one place in the calendar that is
+   * still a fixed hue rather than a derived one. */
+  --viewDragboxBackground: var(--nj-amber-500) !important;
+  --viewDropshadowBackground: var(--nj-amber-500) !important;
+  --viewDragboxColor: var(--nj-ink-950) !important;
+
+  /* ---- Focus ---- */
+  --focus-outline-color: var(--nj-amber-500) !important;
+  --focus-outline-offset: 2px !important;
+
+  /* ---- Motion ---- */
+  --transition-duration: 120ms !important;
+  --transition-timing: cubic-bezier(0.2, 0, 0, 1) !important;
+}

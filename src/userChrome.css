@@ -1,0 +1,22 @@
+/* Nightjar — a dark theme for Thunderbird.
+ *
+ * Entry point for the application chrome. Thunderbird loads exactly this file
+ * from <profile>/chrome/userChrome.css; everything else is pulled in from here.
+ *
+ * @import must come before any other rule, and order is the cascade:
+ *   tokens/   define values
+ *   layers/   consume them
+ */
+
+@import url("tokens/palette.css");
+@import url("tokens/semantic.css");
+@import url("layers/typography.css");
+@import url("layers/icons.css");
+@import url("layers/icons.generated.css");
+@import url("layers/chrome.css");
+
+/* Declare the dark color scheme so Gecko picks dark form controls, scrollbars,
+ * and default widget rendering instead of light ones. */
+:root {
+  color-scheme: dark !important;
+}

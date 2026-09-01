@@ -1,0 +1,236 @@
+/* Nightjar — chrome layer.
+ *
+ * Structural adjustments that the token layer cannot express: surfaces that
+ * Thunderbird paints with a literal value, and the few places where the shape
+ * of the interface changes rather than its color.
+ *
+ * Keep this file small. Anything expressible as a token belongs in
+ * `tokens/semantic.css`, where it survives Thunderbird's internal refactors.
+ */
+
+/* ---- Window surface ----
+ *
+ * Every chrome document, not just the 3-pane. The toolkit paints them all from
+ * one rule in `chrome://global/skin/global-shared.css`:
+ *
+ *   :root { background-color: -moz-Dialog; color: -moz-DialogText; }
+ *
+ * `-moz-Dialog` is the desktop's dialog color — rgb(32, 35, 38) under Breeze
+ * Dark — so every window Thunderbird opens that is not the main one arrived in
+ * system grey: message filters, folder properties, the key manager, every
+ * prompt. There is no token behind it; a system color keyword is the value.
+ *
+ * This used to name `#messengerWindow`, which reached the one window that was
+ * already covered by everything else and none of the windows that needed it. */
+:root {
+  background-color: var(--nj-ink-900) !important;
+  color: var(--nj-slate-100) !important;
+}
+
+/* ---- Top band ----
+ *
+ * The row holding the global search and the window buttons, plus the tab strip
+ * under it. Thunderbird leaves this band to the desktop: `toolbar` resolves to
+ * `-moz-headerbar` on Linux (`toolkit/…/toolbar.css`), and the toolbox around
+ * it is only painted for a lightweight theme, which the default theme is not.
+ * The result is a system grey slab sitting on top of the theme.
+ *
+ * No token expresses it. `--toolbar-background-color` reaches the toolbox only
+ * on `:root[lwtheme]:not([customtitlebar])`, and Thunderbird draws its own
+ * window buttons, so `customtitlebar` is set. Hence a selector.
+ *
+ * The band takes ink-900, the app background, rather than a step of its own:
+ * the point is that it stops being a band. It is the surface the message pane
+ * is already drawn on, so the two meet with nothing between them, and the
+ * folder pane and the search field keep reading as raised because they are
+ * lighter (ink-850, ink-800). The tab strip is recessed back to ink-950
+ * through `--tabs-toolbar-background-color` — see `tokens/semantic.css`.
+ *
+ * `unified-toolbar` closes with a hardcoded black hairline. It is the last
+ * thing drawing a line between this band and the panes, so it goes; the border
+ * is kept at zero-width color rather than removed, to leave the 1px of layout
+ * Thunderbird reserved for it. */
+:is(#navigation-toolbox, #compose-toolbox),
+:is(#navigation-toolbox, #compose-toolbox) toolbar {
+  background-color: var(--nj-ink-900) !important;
+  color: var(--nj-slate-100) !important;
+}
+
+unified-toolbar {
+  border-block-end-color: transparent !important;
+}
+
+/* ---- Folder pane ----
+ *
+ * The pane surface, the unread counts and the folder icon colors are all tokens
+ * now; see `tokens/semantic.css`. What is left are the two row states, which
+ * have no working token: Thunderbird 153 declares `--treeitem-background-hover`
+ * and `--treeitem-background-selected` but no stylesheet consumes them, so
+ * overriding those is a silent no-op. Verified against the shipped CSS. */
+#folderTree li > .container:hover {
+  background-color: var(--nj-ink-700) !important;
+}
+
+#folderTree li.selected > .container {
+  background-color: var(--nj-accent-wash-strong) !important;
+  color: var(--nj-slate-050) !important;
+}
+
+/* ---- Message pane ----
+ *
+ * The pane surface itself is `--layout-background-1`, and the thread list is
+ * `--tree-view-bg` / `--listbox-*` / `--tree-card-*`. Only the header band has
+ * no token of its own. */
+#messageHeader {
+  background-color: var(--nj-ink-850) !important;
+  border-block-end: 1px solid var(--nj-ink-600) !important;
+}
+
+/* ---- Compose window ----
+ *
+ * Thunderbird declares `color-scheme: light-dark` on the header band and the
+ * format toolbar. A declaration on the element beats the inherited value, so
+ * that single line reopens the scheme choice inside them and the native widgets
+ * — the paragraph and font menulists — can come back light against the dark
+ * chrome around them. `color-scheme` has no token, so the reset lives here. */
+:is(#MsgHeadersToolbar, #FormatToolbox) {
+  color-scheme: dark !important;
+}
+
+/* The address rows and the subject line. `shared/messengercompose.css` gives
+ * both `background-color: Field` — the desktop's input color — and puts the
+ * themed alternative behind `:root[lwt-tree]`, which the default theme never
+ * sets. Same gate as the top band and the dialog windows, third instance.
+ *
+ * The focused state has to be repeated because Thunderbird re-declares
+ * `background-color: Field` inside it; the amber border and outline there are
+ * already Nightjar's, through `--toolbar-field-focus-border-color`.
+ *
+ * The recipient pills are deliberately untouched. They are translucent black
+ * and white washes rather than fixed colors, so they follow whatever surface
+ * they sit on, and that surface is now ink. */
+#msgSubject,
+.address-container,
+.address-container[focused="true"] {
+  background-color: var(--nj-ink-800) !important;
+}
+
+/* Thunderbird's own sheet gives `#messageArea` a literal grey under
+ * `prefers-color-scheme: dark`, with no token behind it. It is covered by the
+ * editor in practice, so it is left alone: painting it changed nothing
+ * observable, and an override whose effect cannot be demonstrated is one more
+ * thing to carry through the next upgrade. The band that looked like it was
+ * `#messageArea` is the editor's own body — see `userContent.css`. */
+
+/* ---- XUL trees ----
+ *
+ * Only the dialogs still use these: the filter list, folder properties, the
+ * search window. The 3-pane's folder and thread panes are HTML and are covered
+ * by the layout ramp, which is why this rule's blast radius is small.
+ *
+ * The toolkit styles them entirely from system colors — `Field` for the body,
+ * `-moz-ColHeader` for the column headers, `ThreeDShadow` for the borders — and
+ * declares no token for any of it, so the header stayed a grey band across an
+ * otherwise themed dialog. */
+/* `richlistbox` is here rather than with the trees because the dialogs mix the
+ * two: the filter list is a `richlistbox` wearing `treecols` for a header, so
+ * styling only one of them themes half of it.
+ *
+ * It also needs `appearance: none`, which the tree does not. The toolkit gives
+ * `richlistbox` an `appearance: auto` with `-moz-default-appearance: listbox`,
+ * and a natively-painted widget ignores `background-color` outright — the
+ * declaration below applied and changed nothing until the appearance came off.
+ * That is a third distinct way a rule can look like it failed, after a missing
+ * `!important` and a wrong document. */
+tree,
+richlistbox {
+  background-color: var(--nj-ink-900) !important;
+  color: var(--nj-slate-100) !important;
+  border-color: var(--nj-ink-600) !important;
+}
+
+richlistbox {
+  appearance: none !important;
+}
+
+richlistitem[selected="true"] {
+  background-color: var(--nj-accent-wash) !important;
+  color: var(--nj-slate-050) !important;
+}
+
+richlistbox:focus > richlistitem[selected="true"] {
+  background-color: var(--nj-accent-wash-strong) !important;
+}
+
+treecol,
+.tree-columnpicker-button {
+  background-color: var(--nj-ink-800) !important;
+  color: var(--nj-slate-200) !important;
+  border-inline-start-color: var(--nj-ink-600) !important;
+  box-shadow: inset 0 -1px var(--nj-ink-600) !important;
+}
+
+:is(treecol, .tree-columnpicker-button):hover {
+  background-color: var(--nj-ink-700) !important;
+  color: var(--nj-slate-050) !important;
+}
+
+:is(treecol, .tree-columnpicker-button):hover:active {
+  background-color: var(--nj-ink-600) !important;
+}
+
+/* ---- The account hub's glow ----
+ *
+ * A blurred gradient behind the dialog, `::after` on `.account-hub-dialog`,
+ * written as a literal teal-to-blue in the dark branch. It is the one piece of
+ * the hub with no token behind it, so it stayed cyan after the primary and
+ * surface roles were mapped — visible as a band of light under the dialog's
+ * bottom edge.
+ *
+ * Kept as a glow rather than removed: it is the only decorative flourish in
+ * the application and it does no harm once it is the theme's own hue. */
+.account-hub-dialog::after {
+  background: linear-gradient(
+    to right,
+    var(--nj-amber-600),
+    var(--nj-amber-400),
+    var(--nj-amber-600)
+  ) !important;
+}
+
+/* ---- Warning notification bars ----
+ *
+ * `#ffe900` with black text, hardcoded in `infobar.css`. It is the loudest
+ * thing in the application by a wide margin — the calendar shows one
+ * permanently when no calendar is enabled — and it owes nothing to the theme.
+ *
+ * This has to be a selector rather than a token override even though the names
+ * are tokens: `infobar.css` declares them inside `:host(notification-message
+ * [type="warning"])`, a declaration *on the element*, and an inherited `:root`
+ * value loses to that no matter how important it is. Matching the host from
+ * the light DOM is what wins.
+ *
+ * Amber keeps the bar loud, which is the point of a warning, in the one hue
+ * the theme already uses for attention. Errors are left alone: they are red
+ * from `--color-red-60`, and red reads as error in any palette. */
+notification-message[type="warning"] {
+  --message-bar-background-color: var(--nj-amber-500) !important;
+  --message-bar-text-color: var(--nj-ink-950) !important;
+}
+
+/* ---- Separators ---- */
+.paneSplitter {
+  border-color: var(--nj-ink-600) !important;
+}
+
+/* ---- Scrollbars ---- */
+* {
+  scrollbar-color: var(--nj-ink-600) transparent;
+  scrollbar-width: thin;
+}
+
+/* ---- Focus ---- */
+:focus-visible {
+  outline: 2px solid var(--nj-amber-500) !important;
+  outline-offset: var(--focus-outline-offset) !important;
+}

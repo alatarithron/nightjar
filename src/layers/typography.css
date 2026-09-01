@@ -1,0 +1,110 @@
+/* Nightjar — typography layer.
+ *
+ * The typeface is bundled rather than borrowed from the desktop, so the theme
+ * looks the same on any machine and does not change under you when a system
+ * font is updated. The files live in `src/fonts/` and are loaded by relative
+ * path: unlike a custom property, an `@font-face` `src` resolves against the
+ * stylesheet that *declares* it, so `../fonts/` from here is `src/fonts/` and
+ * the data-URI workaround the icons need (decision 004) does not apply.
+ *
+ * Thunderbird does not expose a UI-font token, so the family is applied
+ * directly to the chrome root. Message *content* fonts are not set here —
+ * those belong to userContent.css and the `font.name.*` prefs, so that
+ * senders' own formatting is not overridden.
+ */
+
+/* IBM Plex Sans, variable. The weight range is 100–700, which is what the
+ * font's `fvar` table actually declares — writing 100–900 here would have the
+ * browser synthesize anything above 700 instead of refusing it. There is a
+ * second axis, `wdth` 75–100, left at its default.
+ *
+ * `font-display: swap` rather than `block`: the files are local so the swap is
+ * imperceptible, and if one ever goes missing the interface falls back to a
+ * system family instead of rendering invisible text for three seconds. */
+@font-face {
+  font-family: "IBM Plex Sans";
+  src: url("../fonts/IBMPlexSansVar.woff2") format("woff2-variations");
+  font-weight: 100 700;
+  font-display: swap;
+}
+
+/* IBM Plex Mono ships no variable cut, so the two weights actually used are
+ * bundled as separate files rather than synthesized. */
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../fonts/IBMPlexMono.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("../fonts/IBMPlexMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --nj-font-ui: "IBM Plex Sans", "Adwaita Sans", "Noto Sans", system-ui, sans-serif;
+  --nj-font-mono: "IBM Plex Mono", "JetBrains Mono", "Noto Sans Mono", monospace;
+
+  /* No type scale. There was one, and it had exactly one consumer — a
+   * `font-size` on `:root` — which turned out to be overriding a setting the
+   * application already owns.
+   *
+   * Thunderbird applies `mail.uifontsize` as an inline `font-size` on the root
+   * element (`UIFontSize.sys.mjs`), and a user stylesheet's `!important` beats
+   * an author's inline style. So the theme won that fight unconditionally: the
+   * slider under Settings › General could not move the interface at any
+   * setting, whatever it was set to.
+   *
+   * How much that cost on the machine this was found on: almost nothing. The
+   * fixed size happened to land within 2% of what the reader's own setting
+   * produced. The bug was never the size, it was that the control was dead.
+   * Removing the declaration was verified against a throwaway profile at
+   * `mail.uifontsize` 20, which now scales the interface as it should.
+   *
+   * One consequence to know about. Plex's cap height is 141 units against
+   * Adwaita's 147, so at the same pixel size the interface reads about 6%
+   * smaller than before the typeface changed. That compensation used to be
+   * baked in here; it now lives where the reader can reach it, one notch up on
+   * that slider.
+   *
+   * `line-height` stays, because the application exposes no control for it. */
+  --nj-leading-normal: 1.45;
+}
+
+/* No density variants here, and that is a finding rather than an omission.
+ * Thunderbird's three densities change padding and row heights; this theme
+ * decides colour, typeface, a line height and a few 1px borders, and none of
+ * those is something density touches. The spaces rail looked like a case for
+ * one and is not: it sizes its icons through `--spaces-icon-size` (16/20/24
+ * across the three) and an SVG scales into whatever box that gives it.
+ *
+ * A `--nj-leading-normal` that varied by density was written and removed. It
+ * could not be shown to do anything: set to 3 under `[uidensity="compact"]` —
+ * a value that would triple every row — the message list rendered identically,
+ * because the rows carry their own line height and never inherit this one. */
+
+:root,
+body {
+  font-family: var(--nj-font-ui) !important;
+  line-height: var(--nj-leading-normal) !important;
+  font-synthesis-weight: none;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Keep monospace intent where it carries meaning. `#raw-message-display` used to
+ * be listed here and was removed: Thunderbird 153 has no such id anywhere in
+ * `omni.ja`. Message source opens as a `view-source:` document whose body is a
+ * `<pre>`, so the first selector already covers it. */
+pre,
+code,
+textarea[is="text-input"][spellcheck="false"] {
+  font-family: var(--nj-font-mono) !important;
+}
+
+/* Unread threads earn weight, not color alone — readable without hue. */
+#threadTree tr[data-properties~="unread"] {
+  font-weight: 600 !important;
+}

@@ -1,0 +1,37 @@
+# Nightjar — KDE color scheme, for the window decoration only.
+#
+# Thunderbird draws its own titlebar on the main window and on no other window:
+# the code that asks for it, `CustomTitlebar` in `messenger.js`, is loaded by
+# `messenger.xhtml` alone. So the compose window — and every other secondary
+# window — is decorated by the window manager instead, putting a bar of the
+# desktop's color on top of the theme. A user stylesheet cannot reach it: CSS
+# sets no attributes, runs no script, and the decoration is negotiated at window
+# creation.
+#
+# This scheme closes that gap from the other side. Applied through a KWin rule,
+# it paints the decoration in Nightjar's own ink, so the bar reads as part of
+# the window rather than on top of it. The rule matches every Thunderbird
+# window and is a no-op on the main one, which has no decoration to recolor. See `docs/kde.md`. It is
+# optional, it changes nothing about Thunderbird, and removing it is deleting
+# two files.
+#
+# Only [WM] is set, because that is the group a per-window decoration color
+# reads. The rest of the desktop keeps whatever scheme it already uses.
+#
+# Values mirror src/tokens/palette.css:
+#   14,19,26     --nj-ink-900    #0e131a  app background
+#    9,12,17     --nj-ink-950    #090c11  window frame
+#   221,228,238  --nj-slate-100  #dde4ee  primary text
+#   141,155,176  --nj-slate-300  #8d9bb0  tertiary text
+
+[General]
+ColorScheme=Nightjar
+Name=Nightjar
+
+[WM]
+activeBackground=14,19,26
+activeBlend=221,228,238
+activeForeground=221,228,238
+inactiveBackground=9,12,17
+inactiveBlend=141,155,176
+inactiveForeground=141,155,176

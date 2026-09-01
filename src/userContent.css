@@ -1,0 +1,65 @@
+/* Nightjar — content layer.
+ *
+ * Applies to documents rendered *inside* Thunderbird: about: pages, the account
+ * hub, and message bodies.
+ *
+ * Deliberately conservative. A message body is someone else's document; forcing
+ * a dark palette onto arbitrary HTML mail breaks contrast in ways the sender
+ * never sees. Only Thunderbird's own pages are restyled here. Use
+ * `View > Message Body As` or a dedicated reader add-on if aggressive
+ * dark-mode rewriting of remote mail is wanted.
+ */
+
+/* Both token files, not just the palette. Thunderbird's own about: pages —
+ * `about:addressbook` first among them — are *content* documents, so
+ * `userChrome.css` never reaches them and they resolved the whole semantic
+ * layer to Thunderbird's defaults, down to the system accent color. Verified
+ * with a two-sheet probe: the same rule in `layers/chrome.css` and here, and
+ * only this one landed.
+ *
+ * Importing at the top level puts the tokens in every content document, mail
+ * bodies included, and that is safe for the same reason the palette already is:
+ * `tokens/semantic.css` declares nothing but custom properties, and a custom
+ * property changes nothing until something reads it. Thunderbird's pages read
+ * these names; a sender's HTML does not. `bin/check.sh` holds that file to
+ * custom properties only, so the guarantee cannot quietly lapse. */
+@import url("tokens/palette.css");
+@import url("tokens/semantic.css");
+
+@-moz-document url-prefix("about:") {
+  :root {
+    color-scheme: dark;
+    background-color: var(--nj-ink-900) !important;
+    color: var(--nj-slate-100) !important;
+  }
+
+  a {
+    color: var(--nj-teal-400) !important;
+  }
+
+  /* The compose editor is an `about:blank` document, so it lands here. Its body
+   * is only as tall as its content — one line in an empty draft — and
+   * Thunderbird paints it a lighter grey than the canvas behind it, which reads
+   * as a band under the format toolbar. Matching the two closes it.
+   *
+   * This is the one message body the theme may repaint: it is the user's own
+   * draft, not a document some sender wrote. Received mail arrives under
+   * `mailbox:`, `imap:` and `news:` and is untouched by this block. */
+  body {
+    background-color: var(--nj-ink-900) !important;
+    color: var(--nj-slate-100) !important;
+  }
+}
+
+/* Plain-text messages are ours to style: no sender formatting to preserve. */
+@-moz-document url-prefix("mailbox:"), url-prefix("imap:"), url-prefix("news:") {
+  body.plaintext-body {
+    background-color: var(--nj-ink-900) !important;
+    color: var(--nj-slate-100) !important;
+  }
+
+  blockquote[type="cite"] {
+    border-inline-start: 2px solid var(--nj-ink-500) !important;
+    color: var(--nj-slate-300) !important;
+  }
+}

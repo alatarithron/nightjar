@@ -1,0 +1,15 @@
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# Local scratch — never commit profile data
+*.local
+/tmp/
+
+# Bundled font binaries are added deliberately, per license.
+# Uncomment if a font's license forbids redistribution:
+# src/fonts/*.woff2

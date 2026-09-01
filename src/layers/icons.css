@@ -1,0 +1,75 @@
+/* Nightjar — icon layer.
+ *
+ * Thunderbird 153 resolves every chrome icon through a `--icon-<name>` custom
+ * property declared on :root (chrome://messenger/skin/icons.css — 223 of them,
+ * listed in `docs/thunderbird-tokens.md`). Redefining one swaps the artwork
+ * everywhere it is used, with no selector archaeology.
+ *
+ * Rules for artwork in `src/icons/`:
+ *   - 16x16 viewBox for the default set, 12x12 for `-xs`, 24x24 for `-lg`.
+ *   - Two tones, and both are required. Thunderbird's consumers expose the icon
+ *     color through `-moz-context-properties: fill, stroke`, where `fill` is
+ *     that color at 20% alpha and `stroke` is it at full alpha:
+ *         fill="context-fill"     → interior wash, nothing readable
+ *         stroke="context-stroke" → the outline that carries the shape
+ *     Artwork painted with `context-fill` alone renders at 20% opacity and
+ *     vanishes against a dark surface. Hardcoded colors ignore the theme
+ *     entirely and look wrong on hover and selection.
+ *   - No <style> blocks and no external references: chrome SVGs are rendered
+ *     as images, so scripts and remote URLs do not load.
+ *
+ * The `--icon-*` overrides themselves are NOT written here. Gecko resolves a
+ * relative url() inside a custom property against the stylesheet that *uses*
+ * the var() — for these properties, chrome://messenger/skin/ — so a relative
+ * path written here silently fails to load. `bin/build-icons.sh` inlines the
+ * artwork as base-independent data: URIs into `icons.generated.css` instead.
+ * See .agents/decisions/004-icons-as-data-uris.md.
+ *
+ * This file keeps the parts that are hand-written: how icons take color.
+ */
+
+/* Icons inherit the current text color through the context properties. Idle
+ * icons sit a step below the text so the interface reads as type first,
+ * chrome second. */
+:root {
+  --nj-icon-idle: var(--nj-slate-200);
+  --nj-icon-active: var(--nj-slate-050);
+}
+
+/* Both tones must be given a value. Declaring `-moz-context-properties` only
+ * says which properties an icon may read; an icon reading `context-stroke` from
+ * an element that never sets `stroke` gets `none` and paints nothing. Since
+ * every Nightjar icon carries its readable shape in `context-stroke`, omitting
+ * it here erases the artwork — the compose window's Send button was blank for
+ * exactly this reason. The ratio mirrors Thunderbird's own consumers: the wash
+ * at 20%, the shape at full alpha. */
+/* Thunderbird declares `-moz-context-properties: fill, fill-opacity` on toolbar
+ * icons — no `stroke` — so the stroke tone is not forwarded here. Supplying
+ * both tones, and the `!important` these need to beat Thunderbird's author
+ * rules, is correct either way: a user sheet loses the cascade without it.
+ *
+ * This is NOT what empties the compose window's Send button. That is a separate,
+ * unresolved defect: a Nightjar `--icon-*` data URI renders nothing at all when
+ * a consumer reaches it through `list-style-image`, while the same data URI
+ * renders correctly through `content:` in the folder pane, and Thunderbird's own
+ * `chrome://` artwork renders correctly through `list-style-image` with this
+ * theme active. Verified by A/B against an uninstalled theme and by substituting
+ * each variable in turn. Do not "fix" it here — see the roadmap. */
+toolbarbutton .toolbarbutton-icon,
+button[is="toolbarbutton-menu-button"] .toolbarbutton-icon {
+  color: var(--nj-icon-idle) !important;
+  fill: color-mix(in srgb, currentColor 20%, transparent) !important;
+  stroke: currentColor !important;
+  -moz-context-properties: fill, fill-opacity, stroke !important;
+}
+
+toolbarbutton:hover .toolbarbutton-icon,
+toolbarbutton[open] .toolbarbutton-icon,
+toolbarbutton[checked] .toolbarbutton-icon {
+  color: var(--nj-icon-active) !important;
+}
+
+/* Attention states are the one place an icon may carry the accent. */
+toolbarbutton[badged="true"] .toolbarbutton-icon {
+  color: var(--nj-amber-500) !important;
+}

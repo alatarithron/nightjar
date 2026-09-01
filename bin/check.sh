@@ -63,6 +63,21 @@ declared_tokens() {
   declarations "$1" | grep -oE '(^|[[:space:]])--[A-Za-z0-9-]+[[:space:]]*:' | tr -d ' \t:'
 }
 
+# Every custom property the theme declares, across every stylesheet. Callers
+# split it: '--nj-*' is the theme's own palette, everything else is an override
+# of a Thunderbird token.
+theme_tokens() {
+  while IFS= read -r f; do declared_tokens "$f"; done < <(css_files) | sort -u
+}
+
+# Every stylesheet, comments removed, as one stream. Read once into ALL_CSS
+# below: strip_comments is an awk pass per file, and the checks that search the
+# whole tree would otherwise repeat it per token.
+stripped_css() {
+  while IFS= read -r f; do strip_comments "$f"; done < <(css_files)
+}
+ALL_CSS="$(stripped_css)"
+
 # ---------------------------------------------------------------------------
 head_ "Overridden tokens exist in Thunderbird"
 # The main rot mode: overriding a custom property Thunderbird does not declare.
@@ -71,8 +86,7 @@ if [ ! -f "$REFERENCE" ]; then
   fail "$REFERENCE is missing — run bin/dump-tb-reference.sh"
 else
   known="$(grep -oE '^--[A-Za-z0-9-]+' "$REFERENCE" | sort -u)"
-  declared="$(while IFS= read -r f; do declared_tokens "$f"; done < <(css_files) \
-              | grep -v '^--nj-' | sort -u)"
+  declared="$(theme_tokens | grep -v '^--nj-')"
   unknown="$(comm -23 <(printf '%s\n' "$declared") <(printf '%s\n' "$known"))"
   if [ -n "$unknown" ]; then
     while IFS= read -r token; do
@@ -97,8 +111,7 @@ else
   if [ -z "$dead" ]; then
     skip "$REFERENCE predates the unconsumed section — re-run bin/dump-tb-reference.sh"
   else
-    ours="$(while IFS= read -r f; do declared_tokens "$f"; done < <(css_files) \
-            | grep -v '^--nj-' | sort -u)"
+    ours="$(theme_tokens | grep -v '^--nj-')"
     inert="$(comm -12 <(printf '%s\n' "$ours") <(printf '%s\n' "$dead"))"
     if [ -n "$inert" ]; then
       while IFS= read -r token; do
@@ -214,14 +227,12 @@ own_count=0
 while IFS= read -r token; do
   [ -n "$token" ] || continue
   own_count=$((own_count + 1))
-  uses="$(while IFS= read -r f; do strip_comments "$f"; done < <(css_files) \
-          | grep -c "var(${token}[,)]")"
+  uses="$(printf '%s\n' "$ALL_CSS" | grep -c "var(${token}[,)]")"
   if [ "$uses" -eq 0 ]; then
     fail "$token is declared by the theme and read by nothing"
     own_dead=1
   fi
-done <<< "$(while IFS= read -r f; do declared_tokens "$f"; done < <(css_files) \
-            | grep '^--nj-' | sort -u)"
+done <<< "$(theme_tokens | grep '^--nj-')"
 [ "$own_dead" -eq 0 ] && pass "$own_count own tokens, all read somewhere"
 
 # ---------------------------------------------------------------------------
@@ -259,10 +270,9 @@ done <<< "$(while IFS= read -r f; do
 # Matched against one pre-built string rather than a `grep -q` pipeline: under
 # `set -o pipefail`, grep exiting early on a match sends SIGPIPE to the left
 # side, and the pipeline then reports 141 even though the match succeeded.
-all_css="$(while IFS= read -r c; do strip_comments "$c"; done < <(css_files))"
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  case "$all_css" in
+  case "$ALL_CSS" in
     *"$(basename "$f")"*) ;;
     *)
       fail "src/fonts/$(basename "$f") is committed but no @font-face references it"
@@ -358,8 +368,7 @@ fi
 # ---------------------------------------------------------------------------
 head_ "Every stylesheet is reachable from an entry point"
 imported="$(css_files | xargs grep -hoE '@import url\("[^"]+"\)' \
-            | sed -E 's/@import url\("([^"]+)"\)/\1/' | sed 's|^|src/|;s|src/tokens/|tokens/|' \
-            | sed -E 's|^src/||' | sort -u)"
+            | sed -E 's/@import url\("([^"]+)"\)/\1/' | sort -u)"
 orphan=0
 while IFS= read -r file; do
   case "$file" in
@@ -377,8 +386,9 @@ head_ "Braces balance"
 unbalanced=0
 while IFS= read -r file; do
   [ -n "$file" ] || continue
-  open=$(strip_comments "$file" | tr -cd '{' | wc -c)
-  close=$(strip_comments "$file" | tr -cd '}' | wc -c)
+  stripped="$(strip_comments "$file")"
+  open=$(printf '%s' "$stripped" | tr -cd '{' | wc -c)
+  close=$(printf '%s' "$stripped" | tr -cd '}' | wc -c)
   if [ "$open" -ne "$close" ]; then
     fail "$file: $open '{' vs $close '}'"; unbalanced=1
   fi
